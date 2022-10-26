@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Client side</title>
+	<link rel="shortcut icon" href="https://img.icons8.com/fluency/96/cash-app--v3.png" type="image/x-icon">
+	<link rel="stylesheet" href="{{ url_for('static', filename='bootstrap.min.css') }}">
+	<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+	<script src="{{ url_for('static', filename='p5.min.js') }}"></script>
+	<script src="{{ url_for('static', filename='jquery.min.js') }}"></script>
+	<script src="{{ url_for('static', filename='bootstrap.min.js') }}"></script>
+	<script src="{{ url_for('static', filename='particles.min.js') }}"></script>
+	<script src="{{ url_for('static', filename='socket.io.min.js') }}"></script>
+
+</head>
+
+<body>
+	<div id="particles-js"></div>
+	<script async>
+		particlesJS.load("particles-js", "{{ url_for('static', filename='particles.json') }}");
+	</script>
+
+	<div class="container-fluid" style="margin: 4em;">
+		<div class="row d-flex justify-content-between">
+			<div style="height: 85vh;">
+				<div id="drawable-area"></div>
+				<div id="btn-group" class="row d-flex justify-content-center">
+					<!-- <div class="btn">Random</div> -->
+					<div class="btn" id="clear">Clear</div>
+					<div class="btn active" id="pen">Pen</div>
+					<div class="btn" id="erase">Erase</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- <button class="menu-toggle">Menu</button> -->
+
+	<!-- <div class="row">
+		<div class="col">
+			
+			<button type="button" class="btn btn-secondary" id="generate">Generate</button>
+		</div>
+		<div class="col">
+			<p class="result"></p>
+		</div>
+	</div> -->
+</body>
+
+
+<script async src="{{ url_for('static', filename='script.js') }}"></script>
+
+</html>
