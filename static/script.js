@@ -2,11 +2,14 @@
 
 const btnGroup = document.querySelector("#btn-group");
 const clear = document.querySelector(".btn#clear");
+const SIZE = 580;
+var sendLock = true;
 var drawMode = true;
+var socket;
 
 new p5((p) => {
   p.setup = function () {
-    p.createCanvas(580, 580);
+    p.createCanvas(SIZE, SIZE);
     p.stroke(255);
     clear.addEventListener("click", () => {
       drawMode = true;
@@ -26,20 +29,27 @@ new p5((p) => {
 // Method function
 
 function DataTransport() {
-  let area = document.getElementById("drawable area").firstChild;
-  let img = area.getContext("2d").getImageData(0, 0, 1024, 1024);
-  // return JSON.stringify(img);
-  return "foo";
+  let newData = new Array(SIZE * SIZE * 4);
+  let data = document
+    .getElementById("drawable-area")
+    .firstChild.getContext("2d")
+    .getImageData(0, 0, SIZE * 2, SIZE * 2).data;
+  for (let i = 0, j = 0; j < SIZE * SIZE * 16; j += 4) {
+    newData[i++] = data[j];
+  }
+  return JSON.stringify(newData);
 }
 
 // Listen function
 
+$("button").on("click", function () {
+  $(this).toggleClass("is-active");
+});
+
 $(document).ready(() => {
-  var socket = io.connect();
-  document.getElementById("generate").addEventListener("click", () => {
-    socket.emit("test", DataTransport());
-    console.log("foo");
-  });
+  socket = io.connect();
+  sendLock = false;
+  // $("#lockBoard").modal("show");
 });
 
 btnGroup.addEventListener("click", (e) => {
@@ -48,15 +58,21 @@ btnGroup.addEventListener("click", (e) => {
     let x = e.target.id == "pen" ? "erase" : "pen";
     btnGroup.children[x].classList.remove("active");
     e.target.classList.add("active");
+  } else if (e.target.id == "random") {
+    console.log("random");
+  } else if (e.target.id == "send") {
+    if (sendLock) {
+      console.log("foo");
+    } else {
+      sendLock = true;
+      let url = document.URL + "generate";
+      let data = DataTransport();
+      $.post(url, data, (res) => {
+        if (res == "OK") {
+        } else {
+          sendLock = false;
+        }
+      });
+    }
   }
-});
-
-// document.getElementById("generate").addEventListener("click", () => {
-//   $.post(`${document.URL}generate`, getImageData(), (result) => {
-//     console.log(result);
-//   });
-// });
-
-$("button").on("click", function () {
-  $(this).toggleClass("is-active");
 });

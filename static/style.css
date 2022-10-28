@@ -9,6 +9,10 @@
   margin: 0;
 }
 
+body {
+  background-color: black;
+}
+
 #particles-js {
   background: linear-gradient(
     180deg,
@@ -34,8 +38,9 @@
   border: 3px solid rgba(255, 255, 255, 0.65);
   border-radius: 14px;
   width: 90px;
-  margin: 16px 16px 0 16px;
+  margin: 12px 16px 0 16px;
   padding: 0;
+  color: #fff;
 }
 
 .btn.active,
@@ -95,4 +100,9 @@ button.is-active:before {
 
 button.is-active:after {
   transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+.modal-content > .modal-header > h5,
+.modal-content > .modal-body {
+  color: #000;
 }
