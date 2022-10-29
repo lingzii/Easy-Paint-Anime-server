@@ -1,4 +1,7 @@
+.ipynb_checkpoints
+cache_files
+__pycache__
+*.7z
 input/image
 checkpoint
 pretrained
-*.7z

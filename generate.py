@@ -1,12 +1,13 @@
-import os
-import argparse
-
-import random
-import numpy as np
-import torch
-from torchvision import utils
 from training.networks.stylegan2 import Generator
+from torchvision import utils
+import numpy as np
+import argparse
+import random
+import torch
+import time
+import os
 
+start = time.process_time()
 
 def save_image_pytorch(img, name):
     """Helper function to save torch tensor into an image file."""
@@ -16,7 +17,7 @@ def save_image_pytorch(img, name):
         nrow=1,
         padding=0,
         normalize=True,
-        range=(-1, 1),
+        value_range=(-1, 1),
     )
 
 
@@ -36,6 +37,7 @@ def generate(args, netG, device, mean_latent):
 
         # Generate images from a file of input noises
         if args.fixed_z is not None:
+            print(1)
             sample_z = torch.load(args.fixed_z, map_location=device) + w_shift
             for start in range(0, sample_z.size(0), args.batch_size):
                 end = min(start + args.batch_size, sample_z.size(0))
@@ -63,7 +65,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
     parser.add_argument('--save_dir', type=str, default='./output', help="place to save the output")
-    parser.add_argument('--ckpt', type=str, default=None, help="checkpoint file for the generator")
+    parser.add_argument('--ckpt', type=str, default="./checkpoint/animate/0_net_G.pth", help="checkpoint file for the generator")
     parser.add_argument('--size', type=int, default=256, help="output size of the generator")
     parser.add_argument('--fixed_z', type=str, default=None, help="expect a .pth file. If given, will use this file as the input noise for the output")
     parser.add_argument('--w_shift', type=str, default=None, help="expect a .pth file. Apply a w-latent shift to the generator")
@@ -75,8 +77,8 @@ if __name__ == '__main__':
     parser.add_argument('--device', type=str, default='cuda')
 
     args = parser.parse_args()
-
     device = args.device
+
     # use a fixed seed if given
     if args.seed is not None:
         random.seed(args.seed)
@@ -99,3 +101,4 @@ if __name__ == '__main__':
         mean_latent = None
 
     generate(args, netG, device, mean_latent)
+    print(f"End / Spend: {time.process_time() - start:.06f} sec")

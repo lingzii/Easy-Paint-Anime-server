@@ -65,9 +65,9 @@ def get_opt():
 
     parser.add_argument("--optim_param_g", type=str, default="style", choices=[
                         "style", "w_shift"], help="choose the parameter subset to train: (style) tunes the style mapping network, (w_shift) tunes just a shift to the W space")
-    parser.add_argument("--g_pretrained", type=str, default="",
+    parser.add_argument("--g_pretrained", type=str, default="./pretrained/g_net.pth",
                         help="path to the pre-trained generator")
-    parser.add_argument("--d_pretrained", type=str, default="",
+    parser.add_argument("--d_pretrained", type=str, default="./pretrained/d_net.pth",
                         help="path to the pre-trained discriminator")
     parser.add_argument("--dsketch_no_pretrain", action="store_true",
                         help="use this flag to randomly initialize the sketch discriminator")
@@ -81,7 +81,7 @@ def get_opt():
 
     parser.add_argument("--gan_mode", type=str, default="softplus",
                         help="which gan loss to use? [ls|original|w|hinge|softplus]")
-    parser.add_argument("--l_image", type=float, default=0,
+    parser.add_argument("--l_image", type=float, default=0.7,
                         help="strength of image regularization loss")
     parser.add_argument("--l_weight", type=float, default=0,
                         help="strength of weight regularization loss")
@@ -98,7 +98,7 @@ def get_opt():
                         help="sequence of operations to transform the fake images before D")
     parser.add_argument("--photosketch_path", type=str, default='./pretrained/photosketch.pth',
                         help="path to the photosketch pre-trained model")
-    parser.add_argument("--diffaug_policy", type=str, default='',
+    parser.add_argument("--diffaug_policy", type=str, default='translation',
                         help='sequence of operations used for differentiable augmentation')
 
     opt = parser.parse_args()

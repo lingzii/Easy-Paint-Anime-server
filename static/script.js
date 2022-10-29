@@ -2,6 +2,7 @@
 
 const btnGroup = document.querySelector("#btn-group");
 const clear = document.querySelector(".btn#clear");
+const bar = document.querySelector("#bar");
 const SIZE = 580;
 var sendLock = true;
 var drawMode = true;
@@ -40,6 +41,12 @@ function DataTransport() {
   return JSON.stringify(newData);
 }
 
+function changeBar(data) {
+  now = (100 * data[1] / data[2]) + "%";
+  bar.style.width = bar.innerText = now;
+  $(".lockBoard").text(data[0]+"...");
+}
+
 // Listen function
 
 $("button").on("click", function () {
@@ -49,7 +56,16 @@ $("button").on("click", function () {
 $(document).ready(() => {
   socket = io.connect();
   sendLock = false;
-  // $("#lockBoard").modal("show");
+  
+  socket.on('progress', (data) => {
+    changeBar(data);
+  });
+
+  socket.on('finish', (data) => {
+    $("#lockBoard").modal("hide");
+    sendLock = false;
+    // show output image
+  });
 });
 
 btnGroup.addEventListener("click", (e) => {
@@ -64,11 +80,14 @@ btnGroup.addEventListener("click", (e) => {
     if (sendLock) {
       console.log("foo");
     } else {
+      $("#lockBoard").modal("show");
+      changeBar(["Pending", 0, 10]);
       sendLock = true;
-      let url = document.URL + "generate";
       let data = DataTransport();
+      let url = document.URL + "generate";
       $.post(url, data, (res) => {
         if (res == "OK") {
+
         } else {
           sendLock = false;
         }
