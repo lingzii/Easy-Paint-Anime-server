@@ -12,11 +12,11 @@ class Config:
         self.G_maxTime = None
         self.recordFirstTime()
         print("----- Server initialized -----")
-    
+
     def recordFirstTime(self):
         print("----- Training test start ----")
         beg = process_time()
-        cmd = "python generate.py --samples 1"
+        cmd = "python generate.py --samples 5"
         p = Popen(cmd.split(' '), stdout=PIPE)
         while p.poll() is None:
             pass

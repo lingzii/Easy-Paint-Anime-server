@@ -42,9 +42,9 @@ function DataTransport() {
 }
 
 function changeBar(data) {
-  now = (100 * data[1] / data[2]) + "%";
+  now = Math.round((100 * data[1]) / data[2]) + "%";
   bar.style.width = bar.innerText = now;
-  $(".lockBoard").text(data[0]+"...");
+  $(".lockBoard").text(data[0] + "...");
 }
 
 // Listen function
@@ -56,15 +56,25 @@ $("button").on("click", function () {
 $(document).ready(() => {
   socket = io.connect();
   sendLock = false;
-  
-  socket.on('progress', (data) => {
+
+  socket.on("progress", (data) => {
     changeBar(data);
   });
 
-  socket.on('finish', (data) => {
+  socket.on("finish", (data) => {
+    $(".carousel-inner").empty();
+    for (let i = 0; i < data; i++) {
+      $(".carousel-inner").append(
+        `<div class="carousel-item">
+       <img src="image/${i}.png"class="d-block w-100">
+       </div>`
+      );
+    }
+    $(".carousel-item")[0].classList.add("active");
+    $("#display").show();
+    $("#imageControl>div").show();
     $("#lockBoard").modal("hide");
     sendLock = false;
-    // show output image
   });
 });
 
@@ -87,11 +97,18 @@ btnGroup.addEventListener("click", (e) => {
       let url = document.URL + "generate";
       $.post(url, data, (res) => {
         if (res == "OK") {
-
         } else {
           sendLock = false;
         }
       });
     }
   }
+});
+
+document.querySelector("#imageControl #prev").addEventListener("click", () => {
+  $("#displayCarousel").carousel("prev");
+});
+
+document.querySelector("#imageControl #next").addEventListener("click", () => {
+  $("#displayCarousel").carousel("next");
 });
