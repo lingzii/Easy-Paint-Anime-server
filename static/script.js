@@ -4,6 +4,7 @@ const btnGroup = document.querySelector("#btn-group");
 const clear = document.querySelector(".btn#clear");
 const bar = document.querySelector("#bar");
 const SIZE = 580;
+var selectImage;
 var sendLock = true;
 var drawMode = true;
 var socket;
@@ -118,5 +119,18 @@ document.querySelector("#imageControl #next").addEventListener("click", () => {
 });
 
 document.querySelector("#imageControl #save").addEventListener("click", () => {
+  let childs = $(".carousel-inner").children();
+  for (let i = 0; i < childs.length; i++) {
+    if (childs[i].classList.contains("active")) {
+      selectImage = i;
+      break;
+    }
+  }
+  $("img#figure").attr("src", `image/${selectImage}.png`);
   $("#emailBox").modal("show");
+});
+
+$("button#send").click(() => {
+  socket.emit("email", [$("input#email").val(), selectImage]);
+  $("#emailBox").modal("hide");
 });

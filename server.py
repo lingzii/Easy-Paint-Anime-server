@@ -3,6 +3,7 @@ from flask import Flask, request, render_template, send_file
 from flask_socketio import SocketIO
 from subprocess import Popen, PIPE
 from util.config import Config
+from util.smtp import sendEmail
 from threading import Thread
 from eventlet import sleep, monkey_patch
 from PIL import ImageOps
@@ -64,6 +65,10 @@ def image(index):
 @app.route("/")
 def index():
     return render_template("index.html")
+
+@socketio.on("email")
+def email(data):
+    sendEmail(data[0], f"output/{data[1]:06}.png")
 
 
 if __name__ == '__main__':

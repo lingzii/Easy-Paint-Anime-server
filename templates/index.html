@@ -16,9 +16,9 @@
 
 <body>
 	<div id="particles-js"></div>
-	<!-- <script async>
+	<script async>
 		particlesJS.load("particles-js", "{{ url_for('static', filename='particles.json') }}");
-	</script> -->
+	</script>
 
 	<div class="container-fluid" style="margin: 4em;">
 		<div class="row">
@@ -77,13 +77,14 @@
 				<div class="modal-body">
 					<div class="input-group mb-3">
 						<span class="input-group-text" id="basic-addon1">email</span>
-						<input type="text" class="form-control" placeholder="xxxxxxxx@me.mcu.edu.tw">
+						<input id="email" type="text" class="form-control" autocomplete=“off”
+							placeholder="xxxxxxxx@me.mcu.edu.tw">
 					</div>
 					<div style="width:256px;border-radius:40px;margin-left:auto;margin-right:auto;">
-						<img src="image/0.png">
+						<img id="figure" src="image/0.png">
 					</div>
-					<div style="float: right;">
-						<button type="button" class="btn btn-secondary">Send!</button>
+					<div style="float: right;margin-top: 20px;">
+						<button id="send" type="button" class="btn btn-secondary">Send!</button>
 					</div>
 				</div>
 			</div>

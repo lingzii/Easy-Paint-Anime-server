@@ -530,6 +530,7 @@ dependencies:
     - pathtools==0.1.2
     - promise==2.3
     - protobuf==3.19.6
+    - pycryptodome==3.15.0
     - pyserial==3.5
     - python-engineio==4.3.4
     - python-socketio==5.7.2
