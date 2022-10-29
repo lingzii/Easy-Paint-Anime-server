@@ -57,6 +57,10 @@ $(document).ready(() => {
   socket = io.connect();
   sendLock = false;
 
+  $(".carousel").carousel({
+    interval: false,
+  });
+
   socket.on("progress", (data) => {
     changeBar(data);
   });
@@ -111,4 +115,8 @@ document.querySelector("#imageControl #prev").addEventListener("click", () => {
 
 document.querySelector("#imageControl #next").addEventListener("click", () => {
   $("#displayCarousel").carousel("next");
+});
+
+document.querySelector("#imageControl #save").addEventListener("click", () => {
+  $("#emailBox").modal("show");
 });
