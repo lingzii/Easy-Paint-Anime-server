@@ -11,47 +11,53 @@ from PIL import Image
 from json import loads
 import numpy as np
 
-
 app = Flask(__name__)
-app.debug = True
+# app.debug = True
 socketio = SocketIO(app, async_mode='eventlet')
 config = Config()
+ORI_SIZE = 600
 IMG_SIZE = 512
 
 
-def generateTask():
-    cmd = "python generate.py --samples 5"
+def trainingTask():
+    cmd = 'python train.py --name animate --batch 1 --max_iter 10 --disable_eval --no_wandb --dataroot_sketch "./input/sketch" --dataroot_image "./input/image"'
     p = Popen(cmd.split(' '), stdout=PIPE)
     T_maxTime = int(config.T_maxTime + .5)
     config.T_time = 0
     while p.poll() is None and not sleep(1):
-        socketio.emit('progress', ["Training", config.T_time, T_maxTime])
+        socketio.emit('progress', config.bar("Training", T_maxTime))
         config.T_time += 1
-    socketio.emit('progress', ["Training", T_maxTime, T_maxTime])
+    socketio.emit('progress', config.bar("Training"))
     config.T_maxTime = (config.T_time + T_maxTime) / 2
-    sleep(1)
+    sleep(0.5)
+    generateTask()
 
-    cmd = "python generate.py --samples 1"
+
+def generateTask():
+    cmd = "python generate.py --samples 10"
     p = Popen(cmd.split(' '), stdout=PIPE)
     G_maxTime = int(config.G_maxTime + .5)
     config.G_time = 0
     while p.poll() is None and not sleep(1):
-        socketio.emit('progress', ["Generate", config.G_time, G_maxTime])
+        socketio.emit('progress', config.bar("Generate", G_maxTime))
         config.G_time += 1
-    socketio.emit('progress', ["Generate", G_maxTime, G_maxTime])
+    socketio.emit('progress', config.bar("Generate"))
     config.G_maxTime = (config.G_time + G_maxTime) / 2
     sleep(1)
 
-    socketio.emit("finish", 5)
+    socketio.emit("finish")
 
 
-@app.route("/generate", methods=['POST'])
+@app.route("/training", methods=['POST'])
 def generate():
     data = list(map(int, loads(list(request.values.keys())[0])))
-    data = np.asarray(data, np.uint8).reshape((1160, 1160))
+    data = np.asarray(data, np.uint8).reshape((-1, ORI_SIZE*2))
     img = Image.fromarray(data).resize((IMG_SIZE, IMG_SIZE))
     ImageOps.invert(img).save("./input/sketch/result.png")
-    config.task = Thread(target=generateTask)
+
+    # config.task = Thread(target=trainingTask)
+    config.task = Thread(target=generateTask)  # Skip use GPU
+
     config.task.start()
     return "OK"
 
@@ -66,6 +72,13 @@ def image(index):
 def index():
     return render_template("index.html")
 
+
+@socketio.on("generate")
+def generate():
+    config.task = Thread(target=generateTask)
+    config.task.start()
+
+
 @socketio.on("email")
 def email(data):
     sendEmail(data[0], f"output/{data[1]:06}.png")
@@ -73,5 +86,4 @@ def email(data):
 
 if __name__ == '__main__':
     monkey_patch()
-    socketio.run(app, debug=False, host="0.0.0.0", port=8080)
-    # app.run(host="0.0.0.0", port=8080)
+    socketio.run(app, host="0.0.0.0", port=8080)

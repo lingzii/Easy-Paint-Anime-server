@@ -1,19 +1,16 @@
 // Initial function
 
-const btnGroup = document.querySelector("#btn-group");
-const clear = document.querySelector(".btn#clear");
 const bar = document.querySelector("#bar");
-const SIZE = 580;
-var selectImage;
-var sendLock = true;
+const SIZE = 600;
 var drawMode = true;
+var select;
 var socket;
 
 new p5((p) => {
   p.setup = function () {
     p.createCanvas(SIZE, SIZE);
     p.stroke(255);
-    clear.addEventListener("click", () => {
+    $(".btn#clear").click(() => {
       drawMode = true;
       p.clear();
     });
@@ -30,33 +27,46 @@ new p5((p) => {
 
 // Method function
 
+const validateEmail = (email) => {
+  return email.match(
+    /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+  );
+};
+
 function DataTransport() {
-  let newData = new Array(SIZE * SIZE * 4);
+  let newData = new Array(SIZE * SIZE);
   let data = document
     .getElementById("drawable-area")
     .firstChild.getContext("2d")
-    .getImageData(0, 0, SIZE * 2, SIZE * 2).data;
-  for (let i = 0, j = 0; j < SIZE * SIZE * 16; j += 4) {
+    .getImageData(0, 0, SIZE, SIZE).data;
+  for (let i = 0, j = 0; j < SIZE * SIZE * 4; j += 4) {
     newData[i++] = data[j];
   }
   return JSON.stringify(newData);
 }
 
 function changeBar(data) {
-  now = Math.round((100 * data[1]) / data[2]) + "%";
+  let val = (100 * data[1]) / data[2];
+  let now = `${Math.round(val)}%`;
   bar.style.width = bar.innerText = now;
   $(".lockBoard").text(data[0] + "...");
 }
 
-// Listen function
+function imgUri(i) {
+  let time = new Date().getTime();
+  return `image/${i}.png?t=${time}`;
+}
 
-$("button").on("click", function () {
-  $(this).toggleClass("is-active");
-});
+function refreshDisplay() {
+  let img = `<img src="${imgUri(select)}" width=600>`;
+  $("#display-area").empty();
+  $("#display-area").append(img);
+}
+
+// Socket function
 
 $(document).ready(() => {
   socket = io.connect();
-  sendLock = false;
 
   $(".carousel").carousel({
     interval: false,
@@ -66,71 +76,91 @@ $(document).ready(() => {
     changeBar(data);
   });
 
-  socket.on("finish", (data) => {
-    $(".carousel-inner").empty();
-    for (let i = 0; i < data; i++) {
-      $(".carousel-inner").append(
-        `<div class="carousel-item">
-       <img src="image/${i}.png"class="d-block w-100">
-       </div>`
-      );
+  socket.on("finish", () => {
+    let first = $('<div class="row g-4 mb-4"></div>');
+    let second = $('<div class="row mb-4"></div>');
+    for (let i = 0; i < 10; i++) {
+      let card = $('<div class="card" style="width: 12rem;"></div>');
+      let area = $('<div class="col"></div>');
+      card.append($(`<img src="${imgUri(i)}" data=${i}>`));
+      area.append(card);
+      i < 5 ? first.append(area) : second.append(area);
     }
-    $(".carousel-item")[0].classList.add("active");
-    $("#display").show();
-    $("#imageControl>div").show();
+    $("div#view-area").empty();
+    $("div#view-area").append(first, second);
+    select = 0;
+    let ls = $("#view-area>div>div>div>img");
+    ls.first().parent().addClass("border-primary");
+    refreshDisplay();
     $("#lockBoard").modal("hide");
-    sendLock = false;
   });
 });
 
-btnGroup.addEventListener("click", (e) => {
-  if (e.target.id == "pen" || e.target.id == "erase") {
-    drawMode = e.target.id == "pen" ? true : false;
-    let x = e.target.id == "pen" ? "erase" : "pen";
-    btnGroup.children[x].classList.remove("active");
-    e.target.classList.add("active");
-  } else if (e.target.id == "random") {
-    console.log("random");
-  } else if (e.target.id == "send") {
-    if (sendLock) {
-      console.log("foo");
-    } else {
-      $("#lockBoard").modal("show");
-      changeBar(["Pending", 0, 10]);
-      sendLock = true;
-      let data = DataTransport();
-      let url = document.URL + "generate";
-      $.post(url, data, (res) => {
-        if (res == "OK") {
-        } else {
-          sendLock = false;
-        }
-      });
+// Listen function
+
+$("button").click(() => {
+  $(this).toggleClass("is-active");
+});
+
+$(".btn#pen").click((e) => {
+  $(".btn#erase").removeClass("active");
+  e.target.classList.add("active");
+  drawMode = true;
+});
+
+$(".btn#erase").click((e) => {
+  $(".btn#pen").removeClass("active");
+  e.target.classList.add("active");
+  drawMode = false;
+});
+
+$(".btn#train").click((e) => {
+  $("#lockBoard").modal("show");
+  changeBar(["Pending", 1, 1]);
+  let url = document.URL + "training";
+  let data = DataTransport();
+  $.post(url, data, (res) => {
+    if (res != "OK") {
+      console.log("error"); // TODO: Error method
     }
-  }
+  });
 });
 
-document.querySelector("#imageControl #prev").addEventListener("click", () => {
-  $("#displayCarousel").carousel("prev");
+$(".btn#generate").click(() => {
+  $("#lockBoard").modal("show");
+  changeBar(["Pending", 1, 1]);
+  socket.emit("generate");
 });
 
-document.querySelector("#imageControl #next").addEventListener("click", () => {
-  $("#displayCarousel").carousel("next");
+$(".btn#more").click(() => {
+  $("#viewList").modal("show");
 });
 
-document.querySelector("#imageControl #save").addEventListener("click", () => {
-  let childs = $(".carousel-inner").children();
-  for (let i = 0; i < childs.length; i++) {
-    if (childs[i].classList.contains("active")) {
-      selectImage = i;
-      break;
-    }
-  }
-  $("img#figure").attr("src", `image/${selectImage}.png`);
+$(".btn#email").click(() => {
+  $("#figure").attr("src", imgUri(select));
   $("#emailBox").modal("show");
 });
 
 $("button#send").click(() => {
-  socket.emit("email", [$("input#email").val(), selectImage]);
-  $("#emailBox").modal("hide");
+  let val = $("input#email").val();
+  if (!!val && validateEmail(val)) {
+    socket.emit("email", [val, select]);
+    $("#emailBox").modal("hide");
+  } else {
+    console.log("error");
+  }
+});
+
+$("#view-area").click((e) => {
+  if (e.target.nodeName == "IMG") {
+    select = parseInt($(e.target).attr("data"));
+    let ls = $("#view-area>div>div>div>img");
+    ls.each((i) => {
+      let box = $(ls[i]).parent();
+      if (select == i) box.addClass("border-primary");
+      else box.removeClass("border-primary");
+    });
+    refreshDisplay();
+    $("#viewList").modal("hide");
+  }
 });

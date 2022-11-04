@@ -2,100 +2,117 @@
 <html lang="zh-Hant">
 
 <head>
-	<meta charset="UTF-8" />
-	<meta name="viewport" content="width=device-width, initial-scale=1" />
-	<title>Client side</title>
-	<link rel="shortcut icon" href="https://img.icons8.com/fluency/96/cash-app--v3.png" type="image/x-icon" />
-	<link rel="stylesheet" href="{{ url_for('static', filename='bootstrap.min.css') }}" />
-	<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
-	<script src="{{ url_for('static', filename='p5.min.js') }}"></script>
-	<script src="{{ url_for('static', filename='jquery.min.js') }}"></script>
-	<script src="{{ url_for('static', filename='particles.min.js') }}"></script>
-	<script src="{{ url_for('static', filename='socket.io.min.js') }}"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Client side</title>
+  <link rel="shortcut icon" href="https://img.icons8.com/fluency/96/cash-app--v3.png" type="image/x-icon" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap.min.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  <script src="{{ url_for('static', filename='p5.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='jquery.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='particles.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='socket.io.min.js') }}"></script>
 </head>
 
 <body>
-	<div id="particles-js"></div>
-	<script async>
-		particlesJS.load("particles-js", "{{ url_for('static', filename='particles.json') }}");
-	</script>
+  <div id="particles-js"></div>
+  <script async>
+    particlesJS.load("particles-js", "static/particles.json");
+  </script>
 
-	<div class="container-fluid" style="margin: 4em;">
-		<div class="row">
-			<div class="col-5">
-				<div class="row d-flex justify-content-between" style="width: 580px;">
-					<div style="height: 85vh;">
-						<div id="drawable-area"></div>
-						<div id="btn-group" class="row d-flex justify-content-center">
-							<!-- <div class="btn" id="random">Random</div> -->
-							<div class="btn" id="clear">Clear</div>
-							<div class="btn active" id="pen">Pen</div>
-							<div class="btn" id="erase">Erase</div>
-							<div class="btn" id="send">Generate</div>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div class="col-7">
-				<div id="display">
-					<div id="displayCarousel" class="carousel slide" data-interval="false">
-						<div class="carousel-inner"></div>
-					</div>
-				</div>
-				<div id="imageControl" class="row d-flex justify-content-center"
-					style="width: 500px; margin-left: 100px;">
-					<div class="btn" id="prev">↩ Prev</div>
-					<div class="btn" id="next">Next ↪</div>
-					<div class="btn" id="save">Save</div>
-				</div>
-			</div>
-		</div>
-	</div>
+  <div class="container-fluid row_item" style="flex-wrap: wrap">
+    <div class="row row_item" style="height: 85vh">
+      <div class="col-6 pr-5">
+        <div class="col_item">
+          <div id="drawable-area"></div>
+          <div id="btn-group">
+            <div class="btn" id="clear">Clear</div>
+            <div class="btn active" id="pen">Pen</div>
+            <div class="btn" id="erase">Erase</div>
+            <div class="btn" id="train">Train</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-6 pl-5">
+        <div class="col_item">
+          <div id="display-area"></div>
+          <div id="btn-group">
+            <div class="btn" id="generate">Generate</div>
+            <div class="btn" id="more">See more...</div>
+            <div class="btn" id="email">Save Image from Email</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
-	<div class="modal fade" id="lockBoard" data-bs-backdrop="static" data-bs-keyboard="false">
-		<div class="modal-dialog modal-dialog-centered">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h5 class="lockBoard modal-title"></h5>
-				</div>
-				<div class="modal-body">
-					<div class="progress">
-						<div id="bar" class="progress-bar progress-bar-striped progress-bar-animated bg-info"
-							role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
+  <div class="modal fade" id="lockBoard" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="lockBoard modal-title"></h5>
+        </div>
+        <div class="modal-body">
+          <div class="progress">
+            <div role="progressbar" id="bar" class="progress-bar progress-bar-striped progress-bar-animated bg-info">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
-	<div class="modal fade" id="emailBox">
-		<div class="modal-dialog modal-dialog-centered">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h5 class="modal-title">Email image to you</h5>
-				</div>
-				<div class="modal-body">
-					<div class="input-group mb-3">
-						<span class="input-group-text" id="basic-addon1">email</span>
-						<input id="email" type="text" class="form-control" autocomplete=“off”
-							placeholder="xxxxxxxx@me.mcu.edu.tw">
-					</div>
-					<div style="width:256px;border-radius:40px;margin-left:auto;margin-right:auto;">
-						<img id="figure" src="image/0.png">
-					</div>
-					<div style="float: right;margin-top: 20px;">
-						<button id="send" type="button" class="btn btn-secondary">Send!</button>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
+  <div class="modal fade" id="viewList">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Select others...</h5>
+        </div>
+        <div class="modal-body">
+          <div class="container-fluid" id="view-area"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="emailBox">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Save Image from Email</h5>
+        </div>
+        <div class="modal-body">
+          <div class="input-group mb-3">
+            <span class="input-group-text" id="basic-addon1">email</span>
+            <input id="email" type="text" class="form-control" autocomplete=“off” placeholder="xxxxxxxx@me.mcu.edu.tw">
+          </div>
+          <div style="width:256px;border-radius:40px;margin-left:auto;margin-right:auto;">
+            <img id="figure" src="image/0.png">
+          </div>
+          <div style="float: right;margin-top: 20px;">
+            <button id="send" type="button" class="btn btn-secondary">Send!</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="alert">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Alert</h5>
+        </div>
+        <div class="modal-body">
+          <p id="alertText"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </body>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"
-	integrity="sha384-p34f1UUtsS3wqzfto5wAAmdvj+osOnFyQFpp4Ua3gs/ZVWx6oOypYoCJhGGScy+8"
-	crossorigin="anonymous"></script>
+<script src="{{ url_for('static', filename='bootstrap.min.js') }}"></script>
 <script src="{{ url_for('static', filename='popper.min.js') }}"></script>
-<script async src="{{ url_for('static', filename='script.js') }}"></script>
+<script src="{{ url_for('static', filename='script.js') }}"></script>
 
 </html>

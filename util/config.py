@@ -25,9 +25,17 @@ class Config:
 
         print("----- Generate test start ----")
         beg = process_time()
-        cmd = "python generate.py --samples 1"
+        cmd = "python generate.py --samples 10"
         p = Popen(cmd.split(' '), stdout=PIPE)
         while p.poll() is None:
             pass
         self.G_maxTime = process_time() - beg
         p.terminate()
+
+    def bar(self, mode, time=-1):
+        if time == -1:
+            return [mode, 100, 100]
+        elif mode == "Training":
+            return [mode, self.T_time, time]
+        elif mode == "Generate":
+            return [mode, self.G_time, time]
