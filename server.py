@@ -1,4 +1,3 @@
-from fileinput import filename
 from flask import Flask, request, render_template, send_file
 from flask_socketio import SocketIO
 from subprocess import Popen, PIPE
@@ -20,7 +19,7 @@ IMG_SIZE = 512
 
 
 def trainingTask():
-    cmd = 'python train.py --name animate --batch 1 --max_iter 10 --disable_eval --no_wandb --dataroot_sketch "./input/sketch" --dataroot_image "./input/image"'
+    cmd = 'python train.py --name animate --batch 1 --max_iter 10 --disable_eval --no_wandb --dataroot_sketch ./input/sketch --dataroot_image ./input/image --g_pretrained ./pretrained/g_net.pth --d_pretrained ./pretrained/d_net.pth'
     p = Popen(cmd.split(' '), stdout=PIPE)
     T_maxTime = int(config.T_maxTime + .5)
     config.T_time = 0
@@ -51,12 +50,12 @@ def generateTask():
 @app.route("/training", methods=['POST'])
 def generate():
     data = list(map(int, loads(list(request.values.keys())[0])))
-    data = np.asarray(data, np.uint8).reshape((-1, ORI_SIZE*2))
-    img = Image.fromarray(data).resize((IMG_SIZE, IMG_SIZE))
+    data = np.asarray(data, np.uint8).reshape((-1, ORI_SIZE))
+    img = Image.fromarray(data).resize((IMG_SIZE//2, IMG_SIZE//2))
     ImageOps.invert(img).save("./input/sketch/result.png")
 
-    # config.task = Thread(target=trainingTask)
-    config.task = Thread(target=generateTask)  # Skip use GPU
+    config.task = Thread(target=trainingTask)
+    # config.task = Thread(target=generateTask)  # Skip use GPU
 
     config.task.start()
     return "OK"

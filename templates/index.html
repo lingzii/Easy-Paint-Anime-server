@@ -1,118 +1,149 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Client side</title>
+    <link
+      rel="shortcut icon"
+      href="https://img.icons8.com/fluency/96/cash-app--v3.png"
+      type="image/x-icon"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='bootstrap.min.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+    <script src="{{ url_for('static', filename='p5.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='jquery.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='bootstrap.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='particles.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='socket.io.min.js') }}"></script>
+  </head>
 
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Client side</title>
-  <link rel="shortcut icon" href="https://img.icons8.com/fluency/96/cash-app--v3.png" type="image/x-icon" />
-  <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap.min.css') }}" />
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
-  <script src="{{ url_for('static', filename='p5.min.js') }}"></script>
-  <script src="{{ url_for('static', filename='jquery.min.js') }}"></script>
-  <script src="{{ url_for('static', filename='particles.min.js') }}"></script>
-  <script src="{{ url_for('static', filename='socket.io.min.js') }}"></script>
-</head>
+  <body>
+    <div id="particles-js"></div>
+    <script async>
+      particlesJS.load("particles-js", "static/particles.json");
+    </script>
 
-<body>
-  <div id="particles-js"></div>
-  <script async>
-    particlesJS.load("particles-js", "static/particles.json");
-  </script>
-
-  <div class="container-fluid row_item" style="flex-wrap: wrap">
-    <div class="row row_item" style="height: 85vh">
-      <div class="col-6 pr-5">
-        <div class="col_item">
-          <div id="drawable-area"></div>
-          <div id="btn-group">
-            <div class="btn" id="clear">Clear</div>
-            <div class="btn active" id="pen">Pen</div>
-            <div class="btn" id="erase">Erase</div>
-            <div class="btn" id="train">Train</div>
+    <div class="container-fluid row_item" style="flex-wrap: wrap">
+      <div class="row row_item" style="height: 85vh">
+        <div class="col-6 pr-5">
+          <div class="col_item">
+            <div id="drawable-area"></div>
+            <div id="btn-group">
+              <div class="btn" id="clear">Clear</div>
+              <div class="btn active" id="pen">Pen</div>
+              <div class="btn" id="erase">Erase</div>
+              <div class="btn" id="train">Train</div>
+            </div>
           </div>
         </div>
-      </div>
-      <div class="col-6 pl-5">
-        <div class="col_item">
-          <div id="display-area"></div>
-          <div id="btn-group">
-            <div class="btn" id="generate">Generate</div>
-            <div class="btn" id="more">See more...</div>
-            <div class="btn" id="email">Save Image from Email</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal fade" id="lockBoard" data-bs-backdrop="static" data-bs-keyboard="false">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="lockBoard modal-title"></h5>
-        </div>
-        <div class="modal-body">
-          <div class="progress">
-            <div role="progressbar" id="bar" class="progress-bar progress-bar-striped progress-bar-animated bg-info">
+        <div class="col-6 pl-5">
+          <div class="col_item">
+            <div id="display-area"></div>
+            <div id="btn-group">
+              <div class="btn" id="generate">Generate</div>
+              <div class="btn" id="more">See more...</div>
+              <div class="btn" id="email">Save Image from Email</div>
             </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <div class="modal fade" id="viewList">
-    <div class="modal-dialog modal-xl modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Select others...</h5>
-        </div>
-        <div class="modal-body">
-          <div class="container-fluid" id="view-area"></div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal fade" id="emailBox">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Save Image from Email</h5>
-        </div>
-        <div class="modal-body">
-          <div class="input-group mb-3">
-            <span class="input-group-text" id="basic-addon1">email</span>
-            <input id="email" type="text" class="form-control" autocomplete=“off” placeholder="xxxxxxxx@me.mcu.edu.tw">
+    <div
+      class="modal fade"
+      id="lockBoard"
+      data-bs-backdrop="static"
+      data-bs-keyboard="false"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="lockBoard modal-title"></h5>
           </div>
-          <div style="width:256px;border-radius:40px;margin-left:auto;margin-right:auto;">
-            <img id="figure" src="image/0.png">
-          </div>
-          <div style="float: right;margin-top: 20px;">
-            <button id="send" type="button" class="btn btn-secondary">Send!</button>
+          <div class="modal-body">
+            <div class="progress">
+              <div
+                role="progressbar"
+                id="bar"
+                class="progress-bar progress-bar-striped progress-bar-animated bg-info"
+              ></div>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <div class="modal fade" id="alert">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Alert</h5>
-        </div>
-        <div class="modal-body">
-          <p id="alertText"></p>
+    <div class="modal fade" id="viewList">
+      <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Select others...</h5>
+          </div>
+          <div class="modal-body">
+            <div class="container-fluid" id="view-area"></div>
+          </div>
         </div>
       </div>
     </div>
-  </div>
 
-</body>
-<script src="{{ url_for('static', filename='bootstrap.min.js') }}"></script>
+    <div class="modal fade" id="emailBox">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Save Image from Email</h5>
+          </div>
+          <div class="modal-body">
+            <div class="input-group mb-3">
+              <span class="input-group-text" id="basic-addon1">email</span>
+              <input
+                id="email"
+                type="text"
+                class="form-control"
+                autocomplete="“off”"
+                placeholder="xxxxxxxx@me.mcu.edu.tw"
+              />
+            </div>
+            <div
+              style="
+                width: 256px;
+                border-radius: 40px;
+                margin-left: auto;
+                margin-right: auto;
+              "
+            >
+              <img id="figure" src="image/0.png" />
+            </div>
+            <div style="float: right; margin-top: 20px">
+              <button id="send" type="button" class="btn btn-secondary">
+                Send!
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="alert">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Alert</h5>
+          </div>
+          <div class="modal-body">
+            <p id="alertText"></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
+
 <script src="{{ url_for('static', filename='popper.min.js') }}"></script>
 <script src="{{ url_for('static', filename='script.js') }}"></script>
-
-</html>

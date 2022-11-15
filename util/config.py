@@ -16,7 +16,7 @@ class Config:
     def recordFirstTime(self):
         print("----- Training test start ----")
         beg = process_time()
-        cmd = "python generate.py --samples 5"
+        cmd = "python train.py --name animate --batch 1 --max_iter 10 --disable_eval --no_wandb --dataroot_sketch ./input/sketch --dataroot_image ./input/image --g_pretrained ./pretrained/g_net.pth --d_pretrained ./pretrained/d_net.pth"
         p = Popen(cmd.split(' '), stdout=PIPE)
         while p.poll() is None:
             pass
