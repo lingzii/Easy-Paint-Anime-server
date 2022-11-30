@@ -72,8 +72,7 @@ def get_opt():
     parser.add_argument("--dsketch_no_pretrain", action="store_true",
                         help="use this flag to randomly initialize the sketch discriminator")
 
-    parser.add_argument("--lr", type=float, default=0.002,
-                        help="learning rate")
+    parser.add_argument("--lr", type=float, default=0.002, help="learning rate")
     parser.add_argument("--beta1", type=float, default=0.0)
     parser.add_argument("--beta2", type=float, default=0.99)
     parser.add_argument("--lr_mlp", type=float, default=0.01,
